@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Info</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Poppins", sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #89f7fe, #66a6ff);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .weather-container {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            text-align: center;
+            width: 350px;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .weather-container:hover {
+            transform: scale(1.02);
+        }
+
+        .weather-container h1 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .search-box {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .search-box input {
+            padding: 10px;
+            width: 70%;
+            border: 2px solid #0078ff;
+            border-radius: 10px 0 0 10px;
+            outline: none;
+            font-size: 16px;
+        }
+
+        .search-box button {
+            padding: 10px;
+            border: none;
+            background: #0078ff;
+            color: white;
+            border-radius: 0 10px 10px 0;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 16px;
+        }
+
+        .search-box button:hover {
+            background: #005fcc;
+        }
+
+        .result-box img {
+            width: 100px;
+            margin: 10px 0;
+        }
+
+        .result-box h2 {
+            color: #222;
+        }
+
+        .result-box p {
+            font-size: 18px;
+            color: #444;
+        }
+    </style>
+</head>
+<body>
+    <div class="weather-container">
+        <h1>🌤 Weather Finder</h1>
+        <div class="search-box">
+            <input type="text" id="cityInput" placeholder="Enter city name...">
+            <button onclick="getWeather()">Search</button>
+        </div>
+        <div id="weatherResult" class="result-box">
+            <!-- Weather info will appear here -->
+        </div>
+    </div>
+
+    <script>
+        async function getWeather() {
+            const city = document.getElementById("cityInput").value.trim();
+            const resultDiv = document.getElementById("weatherResult");
+
+            if (city === "") {
+                resultDiv.innerHTML = "<p>Please enter a city name.</p>";
+                return;
+            }
+
+            const apiKey = "11dbd1e6dd5549f996a180308252910";
+            const url = `http://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${city}&aqi=yes`;
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data.error) {
+                    resultDiv.innerHTML = `<p>City not found. Try again.</p>`;
+                    return;
+                }
+
+                resultDiv.innerHTML = `
+                    <h2>${data.location.name}, ${data.location.country}</h2>
+                    <img src="${data.current.condition.icon}" alt="Weather icon">
+                    <p><b>Temperature:</b> ${data.current.temp_c}°C</p>
+                    <p><b>Condition:</b> ${data.current.condition.text}</p>
+                    <p><b>Humidity:</b> ${data.current.humidity}%</p>
+                    <p><b>Wind:</b> ${data.current.wind_kph} km/h</p>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = "<p>Failed to fetch weather data.</p>";
+                console.error(error);
+            }
+        }
+    </script>
+</body>
+</html>
